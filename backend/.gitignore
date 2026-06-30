@@ -1,0 +1,44 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Enviroment variables
+.env
+
+# Windows-specific files (como você está no Windows, evita subir arquivos inúteis do sistema)
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# Testing (caso você adicione testes com Jest/Vitest no futuro)
+coverage/
+.nyc_output
+
+# Supabase CLI (se você decidir usar a CLI do Supabase para desenvolvimento local/migrations)
+.supabase/local/
+
+# Caches e logs extras
+.eslintcache
+.npm/
