@@ -1,45 +1,42 @@
-import { supabase } from '../config/supabaseClient.js'
+import { funcionarioService } from '../services/funcionarioService.js'
 
-export const listar = async (req, res) => {
-  const { data, error } = await supabase.from('funcionarios').select('*')
-  if (error) return res.status(500).json({ error: error.message })
-  res.json(data)
+export const listar = async (req, res, next) => {
+  try {
+    res.json(await funcionarioService.listarTodas())
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const buscarPorId = async (req, res) => {
-  const { id } = req.params
-  const { data, error } = await supabase.from('funcionarios').select('*').eq('id', id).single()
-  if (error) return res.status(404).json({ error: 'Funcionário não encontrado' })
-  res.json(data)
+export const buscarPorId = async (req, res, next) => {
+  try {
+    res.json(await funcionarioService.buscarPorId(req.params.id))
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const criar = async (req, res) => {
-  const { nome, cpf, telefone, email, cargo, cidade_id } = req.body
-  const { data, error } = await supabase
-    .from('funcionarios')
-    .insert({ nome, cpf, telefone, email, cargo, cidade_id })
-    .select()
-    .single()
-  if (error) return res.status(500).json({ error: error.message })
-  res.status(201).json(data)
+export const criar = async (req, res, next) => {
+  try {
+    res.status(201).json(await funcionarioService.criar(req.body))
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const atualizar = async (req, res) => {
-  const { id } = req.params
-  const { nome, cpf, telefone, email, cargo, cidade_id } = req.body
-  const { data, error } = await supabase
-    .from('funcionarios')
-    .update({ nome, cpf, telefone, email, cargo, cidade_id })
-    .eq('id', id)
-    .select()
-    .single()
-  if (error) return res.status(500).json({ error: error.message })
-  res.json(data)
+export const atualizar = async (req, res, next) => {
+  try {
+    res.json(await funcionarioService.atualizar(req.params.id, req.body))
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const deletar = async (req, res) => {
-  const { id } = req.params
-  const { error } = await supabase.from('funcionarios').delete().eq('id', id)
-  if (error) return res.status(500).json({ error: error.message })
-  res.status(204).send()
+export const deletar = async (req, res, next) => {
+  try {
+    await funcionarioService.remover(req.params.id)
+    res.status(204).send()
+  } catch (err) {
+    next(err)
+  }
 }

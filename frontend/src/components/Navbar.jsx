@@ -1,4 +1,3 @@
-import React from 'react';
 
 const links = [
   { id: 'inicio', label: 'Início' },

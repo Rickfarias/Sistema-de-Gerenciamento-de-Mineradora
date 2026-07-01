@@ -1,36 +1,26 @@
-import pool from '../config/database.js'
+import { supabase } from '../supabaseClient.js'
 
-export const FuncionarioModel = {
-  findAll: async () => {
-    const result = await pool.query('SELECT * FROM funcionarios ORDER BY nome ASC')
-    return result.rows
+export const ServicoModel = {
+  findAll: async (status) => {
+    let query = supabase.from('servico').select('*').order('data_servico', { ascending: false })
+    if (status) query = query.eq('status', status)
+    const { data, error } = await query
+    if (error) throw error; return data
   },
-
   findById: async (id) => {
-    const result = await pool.query('SELECT * FROM funcionarios WHERE id = $1', [id])
-    return result.rows[0]
+    const { data, error } = await supabase.from('servico').select('*').eq('id', id).single()
+    if (error) throw error; return data
   },
-
-  create: async ({ nome, cpf, telefone, email, cargo, cidade_id }) => {
-    const result = await pool.query(
-      `INSERT INTO funcionarios (nome, cpf, telefone, email, cargo, cidade_id)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [nome, cpf, telefone, email, cargo, cidade_id]
-    )
-    return result.rows[0]
+  create: async ({ descricao, status, data_servico, equipamento_id, funcionario_id, cidade_id }) => {
+    const { data, error } = await supabase.from('servico').insert([{ descricao, status, data_servico, equipamento_id, funcionario_id, cidade_id }]).select().single()
+    if (error) throw error; return data
   },
-
-  update: async (id, { nome, cpf, telefone, email, cargo, cidade_id }) => {
-    const result = await pool.query(
-      `UPDATE funcionarios SET nome = $1, cpf = $2, telefone = $3, email = $4, cargo = $5, cidade_id = $6
-       WHERE id = $7 RETURNING *`,
-      [nome, cpf, telefone, email, cargo, cidade_id, id]
-    )
-    return result.rows[0]
+  update: async (id, { descricao, status, data_servico, equipamento_id, funcionario_id, cidade_id }) => {
+    const { data, error } = await supabase.from('servico').update({ descricao, status, data_servico, equipamento_id, funcionario_id, cidade_id }).eq('id', id).select().single()
+    if (error) throw error; return data
   },
-
   remove: async (id) => {
-    const result = await pool.query('DELETE FROM funcionarios WHERE id = $1 RETURNING id', [id])
-    return result.rows[0]
+    const { data, error } = await supabase.from('servico').delete().eq('id', id).select('id').single()
+    if (error) throw error; return data
   }
 }

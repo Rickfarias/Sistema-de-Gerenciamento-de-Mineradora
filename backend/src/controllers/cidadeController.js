@@ -1,36 +1,42 @@
-import { supabase } from '../config/supabaseClient.js'
+import { cidadeService } from '../services/cidadeService.js'
 
-export const listar = async (req, res) => {
-  const { data, error } = await supabase.from('cidades').select('*')
-  if (error) return res.status(500).json({ error: error.message })
-  res.json(data)
+export const listar = async (req, res, next) => {
+  try {
+    res.json(await cidadeService.listarTodas())
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const buscarPorId = async (req, res) => {
-  const { id } = req.params
-  const { data, error } = await supabase.from('cidades').select('*').eq('id', id).single()
-  if (error) return res.status(404).json({ error: 'Cidade não encontrada' })
-  res.json(data)
+export const buscarPorId = async (req, res, next) => {
+  try {
+    res.json(await cidadeService.buscarPorId(req.params.id))
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const criar = async (req, res) => {
-  const { nome, estado } = req.body
-  const { data, error } = await supabase.from('cidades').insert({ nome, estado }).select().single()
-  if (error) return res.status(500).json({ error: error.message })
-  res.status(201).json(data)
+export const criar = async (req, res, next) => {
+  try {
+    res.status(201).json(await cidadeService.criar(req.body))
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const atualizar = async (req, res) => {
-  const { id } = req.params
-  const { nome, estado } = req.body
-  const { data, error } = await supabase.from('cidades').update({ nome, estado }).eq('id', id).select().single()
-  if (error) return res.status(500).json({ error: error.message })
-  res.json(data)
+export const atualizar = async (req, res, next) => {
+  try {
+    res.json(await cidadeService.atualizar(req.params.id, req.body))
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const deletar = async (req, res) => {
-  const { id } = req.params
-  const { error } = await supabase.from('cidades').delete().eq('id', id)
-  if (error) return res.status(500).json({ error: error.message })
-  res.status(204).send()
+export const deletar = async (req, res, next) => {
+  try {
+    await cidadeService.remover(req.params.id)
+    res.status(204).send()
+  } catch (err) {
+    next(err)
+  }
 }

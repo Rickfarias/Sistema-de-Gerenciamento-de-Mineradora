@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import { env } from './src/config/env.js'
 import routes from './src/routes/index.js'
+import { notFound, errorHandler } from './src/middlewares/errorHandler.js'
 
 const app = express()
 
@@ -19,14 +20,8 @@ app.get('/api/status', (req, res) => {
 
 app.use('/api', routes)
 
-app.use((req, res) => {
-  res.status(404).json({ error: 'Rota não encontrada' })
-})
-
-app.use((err, req, res, next) => {
-  console.error(err)
-  res.status(500).json({ error: 'Erro interno do servidor' })
-})
+app.use(notFound)
+app.use(errorHandler)
 
 app.listen(env.port, () => {
   console.log(`\nServidor rodando com sucesso!`)

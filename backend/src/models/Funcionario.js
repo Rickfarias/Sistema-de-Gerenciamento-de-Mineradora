@@ -1,36 +1,24 @@
-import pool from '../config/database.js'
+import { supabase } from '../supabaseClient.js'
 
 export const FuncionarioModel = {
   findAll: async () => {
-    const result = await pool.query('SELECT * FROM funcionarios ORDER BY nome ASC')
-    return result.rows
+    const { data, error } = await supabase.from('funcionario').select('*').order('nome', { ascending: true })
+    if (error) throw error; return data
   },
-
   findById: async (id) => {
-    const result = await pool.query('SELECT * FROM funcionarios WHERE id = $1', [id])
-    return result.rows[0]
+    const { data, error } = await supabase.from('funcionario').select('*').eq('id', id).single()
+    if (error) throw error; return data
   },
-
-  create: async ({ nome, cpf, telefone, email, cargo, cidade_id }) => {
-    const result = await pool.query(
-      `INSERT INTO funcionarios (nome, cpf, telefone, email, cargo, cidade_id)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [nome, cpf, telefone, email, cargo, cidade_id]
-    )
-    return result.rows[0]
+  create: async ({ nome, cpf, cargo, email, cidade_id }) => {
+    const { data, error } = await supabase.from('funcionario').insert([{ nome, cpf, cargo, email, cidade_id }]).select().single()
+    if (error) throw error; return data
   },
-
-  update: async (id, { nome, cpf, telefone, email, cargo, cidade_id }) => {
-    const result = await pool.query(
-      `UPDATE funcionarios SET nome = $1, cpf = $2, telefone = $3, email = $4, cargo = $5, cidade_id = $6
-       WHERE id = $7 RETURNING *`,
-      [nome, cpf, telefone, email, cargo, cidade_id, id]
-    )
-    return result.rows[0]
+  update: async (id, { nome, cpf, cargo, email, cidade_id }) => {
+    const { data, error } = await supabase.from('funcionario').update({ nome, cpf, cargo, email, cidade_id }).eq('id', id).select().single()
+    if (error) throw error; return data
   },
-
   remove: async (id) => {
-    const result = await pool.query('DELETE FROM funcionarios WHERE id = $1 RETURNING id', [id])
-    return result.rows[0]
+    const { data, error } = await supabase.from('funcionario').delete().eq('id', id).select('id').single()
+    if (error) throw error; return data
   }
 }

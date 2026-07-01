@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { cidadeService } from '../services/api';
+import { useCallback, useEffect, useState } from 'react';
+import { cidadeService } from '../../services/api';
 
 export default function Cidades() {
   const [cidades, setCidades] = useState([]);
   const [nome, setNome] = useState('');
   const [estado, setEstado] = useState('');
 
-  useEffect(() => { carregarCidades(); }, []);
-
-  const carregarCidades = async () => {
+  const carregarCidades = useCallback(async () => {
     try {
       const response = await cidadeService.listar();
       setCidades(response.data);
     } catch (error) {
       console.error('Erro ao buscar cidades', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    carregarCidades();
+  }, [carregarCidades]);
 
   const cadastrar = async () => {
     if (!nome || !estado) return alert('Preencha todos os campos!');

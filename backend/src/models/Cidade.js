@@ -1,34 +1,24 @@
-import pool from '../config/database.js'
+import { supabase } from '../supabaseClient.js'
 
 export const CidadeModel = {
   findAll: async () => {
-    const result = await pool.query('SELECT * FROM cidades ORDER BY nome ASC')
-    return result.rows
+    const { data, error } = await supabase.from('cidade').select('*').order('nome', { ascending: true })
+    if (error) throw error; return data
   },
-
   findById: async (id) => {
-    const result = await pool.query('SELECT * FROM cidades WHERE id = $1', [id])
-    return result.rows[0]
+    const { data, error } = await supabase.from('cidade').select('*').eq('id', id).single()
+    if (error) throw error; return data
   },
-
-  create: async ({ nome, estado }) => {
-    const result = await pool.query(
-      'INSERT INTO cidades (nome, estado) VALUES ($1, $2) RETURNING *',
-      [nome, estado]
-    )
-    return result.rows[0]
+  create: async ({ nome, estado, cep }) => {
+    const { data, error } = await supabase.from('cidade').insert([{ nome, estado, cep }]).select().single()
+    if (error) throw error; return data
   },
-
-  update: async (id, { nome, estado }) => {
-    const result = await pool.query(
-      'UPDATE cidades SET nome = $1, estado = $2 WHERE id = $3 RETURNING *',
-      [nome, estado, id]
-    )
-    return result.rows[0]
+  update: async (id, { nome, estado, cep }) => {
+    const { data, error } = await supabase.from('cidade').update({ nome, estado, cep }).eq('id', id).select().single()
+    if (error) throw error; return data
   },
-
   remove: async (id) => {
-    const result = await pool.query('DELETE FROM cidades WHERE id = $1 RETURNING id', [id])
-    return result.rows[0]
+    const { data, error } = await supabase.from('cidade').delete().eq('id', id).select('id').single()
+    if (error) throw error; return data
   }
 }
